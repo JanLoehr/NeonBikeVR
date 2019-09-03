@@ -33,7 +33,6 @@ public class MotorcycleController : MonoBehaviour
     {
         _grabber = ThrottleLever.GetComponent<Grabbable>().Grabber;
         _initialThrottleDir = _grabber.forward;
-        PlayerController.parent = transform;
 
         _isDriving = true;
     }
@@ -41,6 +40,5 @@ public class MotorcycleController : MonoBehaviour
     public void ThrottleReleased()
     {
         _isDriving = false;
-        PlayerController.parent = null;
     }
 }
