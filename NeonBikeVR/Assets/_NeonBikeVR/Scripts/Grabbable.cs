@@ -5,15 +5,18 @@ using UnityEngine.Events;
 
 public class Grabbable : OVRGrabbable
 {
+    [Header("Lock Hand to this")]
+
     [Header("Parameters")]
     public bool LockPosition;
+    [Tooltip("Put 1 in the axis to lock, zero to not locked")]
     public Vector3 LockRotationAxes;
 
     [Header("Events")]
-    public UnityEvent GrabStart;
-    public UnityEvent GrabStop;
+    public OVRGrabberEvent GrabStart;
+    public OVRGrabberEvent GrabStop;
 
-    public Transform Grabber { get; set; }
+    private Transform _oldGrabberParent;
 
     // Start is called before the first frame update
     protected override void Start()
@@ -31,41 +34,34 @@ public class Grabbable : OVRGrabbable
         m_grabbedBy = hand;
         m_grabbedCollider = grabPoint;
 
-        Grabber = m_grabbedBy.transform;
-
-        if (m_grabbedBy is CustomGrabber grabber)
+        if (LockPosition)
         {
-            if (LockPosition)
-            {
-                grabber.LockPosition();
-
-                grabber.SetDontMoveGrabbable();
-            }
-
-            if (LockRotationAxes.magnitude > 1)
-            {
-                grabber.LockRotationAxes(LockRotationAxes.x > 0 ? true : false,
-                                            LockRotationAxes.y > 0 ? true : false,
-                                            LockRotationAxes.z > 0 ? true : false);
-            }
-
-            GrabStart.Invoke();
+            _oldGrabberParent = hand.transform.parent;
+            hand.transform.SetParent(transform.parent);
         }
+
+        if (LockRotationAxes.magnitude > 1)
+        {
+
+        }
+
+        GrabStart.Invoke(m_grabbedBy);
     }
 
     public override void GrabEnd(Vector3 linearVelocity, Vector3 angularVelocity)
     {
-        if (m_grabbedBy is CustomGrabber grabber)
+        if (_oldGrabberParent)
         {
-            grabber.ReleasePosition();
-            grabber.ReleaseRotationAxes();
-
-            GrabStop.Invoke();
+            m_grabbedBy.transform.SetParent(_oldGrabberParent);
         }
 
-        Grabber = null;
-        
+        GrabStop.Invoke(m_grabbedBy);
+
+        _oldGrabberParent = null;
         m_grabbedBy = null;
         m_grabbedCollider = null;
     }
 }
+
+[System.Serializable]
+public class OVRGrabberEvent : UnityEvent<OVRGrabber> { }

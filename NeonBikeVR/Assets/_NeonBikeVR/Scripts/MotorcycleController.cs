@@ -11,6 +11,7 @@ public class MotorcycleController : MonoBehaviour
     private Transform _trans;
     
     private bool _isDriving;
+    
     private Transform _grabber;
     private Vector3 _initialThrottleDir;
 
@@ -21,24 +22,26 @@ public class MotorcycleController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (_isDriving && _initialThrottleDir.y < _grabber.forward.y)
         {
-            _trans.position += _trans.forward * (_grabber.forward.y - _initialThrottleDir.y) * Time.deltaTime;
+            //_trans.position += _trans.forward * (_grabber.forward.y - _initialThrottleDir.y) * Time.deltaTime;
         }
     }
 
-    public void ThrottleGrabbed()
+    public void ThrottleGrabbed(OVRGrabber hand)
     {
-        _grabber = ThrottleLever.GetComponent<Grabbable>().Grabber;
+        _grabber = hand.transform;
+
         _initialThrottleDir = _grabber.forward;
 
         _isDriving = true;
     }
 
-    public void ThrottleReleased()
+    public void ThrottleReleased(OVRGrabber hand)
     {
+        _grabber = null;
         _isDriving = false;
     }
 }

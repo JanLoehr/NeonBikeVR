@@ -90,8 +90,8 @@ public class OVRGrabber : MonoBehaviour
 		// If we are being used with an OVRCameraRig, let it drive input updates, which may come from Update or FixedUpdate.
 
 		OVRCameraRig rig = null;
-		if (transform.parent != null && transform.parent.parent != null)
-			rig = transform.parent.parent.GetComponent<OVRCameraRig>();
+		if (transform.parent != null && transform.parent.parent != null && transform.parent.parent.parent != null)
+			rig = transform.parent.parent.parent.GetComponent<OVRCameraRig>();
 
 		if (rig != null)
 		{
@@ -108,7 +108,7 @@ public class OVRGrabber : MonoBehaviour
         {
             if(gameObject.transform.parent != null)
             {
-                m_parentTransform = gameObject.transform.parent.transform;
+                m_parentTransform = gameObject.transform.parent.parent.transform;
             }
             else
             {

@@ -17,7 +17,7 @@ public class CustomGrabber : OVRGrabber
 
     private void FixedUpdate()
     {
-        UpdatePositionAndRotation();
+        //UpdatePositionAndRotation();
 
         CheckGrabState();
     }
@@ -53,7 +53,7 @@ public class CustomGrabber : OVRGrabber
     private void UpdatePositionAndRotation()
     {
         Vector3 destPos = m_lastPos;
-        if (_updatePosition)
+        if (_updatePosition && operatingWithoutOVRCameraRig)
         {
             Vector3 handPos = OVRInput.GetLocalControllerPosition(m_controller);
             destPos = m_parentTransform.TransformPoint(m_anchorOffsetPosition + handPos);
