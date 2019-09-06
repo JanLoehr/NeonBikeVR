@@ -15,10 +15,13 @@ public class MotorcycleController : MonoBehaviour
     private Transform _grabber;
     private Vector3 _initialThrottleDir;
 
+    private Transform _headTransform;
+
     // Start is called before the first frame update
     void Start()
     {
         _trans = transform;
+        _headTransform = Camera.main.transform;
     }
 
     // Update is called once per frame
@@ -26,7 +29,9 @@ public class MotorcycleController : MonoBehaviour
     {
         if (_isDriving && _initialThrottleDir.y < _grabber.forward.y)
         {
-            //_trans.position += _trans.forward * (_grabber.forward.y - _initialThrottleDir.y) * Time.deltaTime;
+            _trans.position += _trans.forward * (_grabber.forward.y - _initialThrottleDir.y) * Time.deltaTime;
+
+            _trans.Rotate(Vector3.up, _headTransform.localPosition.x);
         }
     }
 

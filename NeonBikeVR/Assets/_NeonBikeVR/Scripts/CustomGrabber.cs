@@ -9,16 +9,33 @@ public class CustomGrabber : OVRGrabber
     [SerializeField]
     private bool _updateRotation;
 
+    public OVRInput.Controller Controller => m_controller;
+
     private Vector3 _lockedRotationAxes;
 
     private Quaternion _lastHandRot;
 
     private bool _moveGrabbable = true;
 
+    protected override void Awake()
+    {
+        m_anchorOffsetPosition = transform.localPosition;
+        m_anchorOffsetRotation = transform.localRotation;
+
+        // If we are being used with an OVRCameraRig, let it drive input updates, which may come from Update or FixedUpdate.
+
+        OVRCameraRig rig = null;
+        if (transform.parent != null && transform.parent.parent != null && transform.parent.parent.parent != null)
+            rig = transform.parent.parent.parent.GetComponent<OVRCameraRig>();
+
+        if (rig != null)
+        {
+            operatingWithoutOVRCameraRig = false;
+        }
+    }
+
     private void FixedUpdate()
     {
-        //UpdatePositionAndRotation();
-
         CheckGrabState();
     }
 
@@ -45,43 +62,6 @@ public class CustomGrabber : OVRGrabber
     public void ReleaseRotationAxes()
     {
         _lockedRotationAxes = Vector3.zero;
-    }
-
-    // Hands follow the touch anchors by calling MovePosition each frame to reach the anchor.
-    // This is done instead of parenting to achieve workable physics. If you don't require physics on
-    // your hands or held objects, you may wish to switch to parenting.
-    private void UpdatePositionAndRotation()
-    {
-        Vector3 destPos = m_lastPos;
-        if (_updatePosition && operatingWithoutOVRCameraRig)
-        {
-            Vector3 handPos = OVRInput.GetLocalControllerPosition(m_controller);
-            destPos = m_parentTransform.TransformPoint(m_anchorOffsetPosition + handPos);
-            GetComponent<Rigidbody>().MovePosition(destPos);
-        }
-
-        Quaternion destRot = m_lastRot;
-        if (_updateRotation)
-        {
-            Quaternion handRot = OVRInput.GetLocalControllerRotation(m_controller);
-
-            //lock axes according lock
-            handRot = Quaternion.Euler(_lockedRotationAxes.x == 1 ? _lastHandRot.eulerAngles.x : handRot.eulerAngles.x,
-                _lockedRotationAxes.y == 1 ? _lastHandRot.eulerAngles.y : handRot.eulerAngles.y,
-                _lockedRotationAxes.z == 1 ? _lastHandRot.eulerAngles.z : handRot.eulerAngles.z);
-
-            destRot = m_parentTransform.rotation * handRot * m_anchorOffsetRotation;
-            GetComponent<Rigidbody>().MoveRotation(destRot);
-
-            _lastHandRot = handRot;
-        }
-
-        if (!m_parentHeldObject && _moveGrabbable)
-        {
-            MoveGrabbedObject(destPos, destRot);
-        }
-        m_lastPos = transform.position;
-        m_lastRot = transform.rotation;
     }
 
     private void CheckGrabState()

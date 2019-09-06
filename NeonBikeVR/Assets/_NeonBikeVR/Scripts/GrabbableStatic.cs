@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Grabbable : OVRGrabbable
+public class GrabbableStatic : OVRGrabbable
 {
     [Header("Lock Hand to this")]
 
@@ -17,16 +17,25 @@ public class Grabbable : OVRGrabbable
     public OVRGrabberEvent GrabStop;
 
     private Transform _oldGrabberParent;
+    private Quaternion _oldRotation;
 
     // Start is called before the first frame update
     protected override void Start()
     {
-        base.Start();
+
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
+        if (m_grabbedBy != null)
+        {
+            Quaternion rotation = OVRInput.GetLocalControllerRotation((m_grabbedBy as CustomGrabber).Controller);
+
+            m_grabbedBy.transform.localRotation = Quaternion.Euler(rotation.eulerAngles.x * (1 - LockRotationAxes.x),
+                                                                rotation.eulerAngles.y * (1 - LockRotationAxes.y),
+                                                                rotation.eulerAngles.z * (1 - LockRotationAxes.z));
+        }
     }
 
     public override void GrabBegin(OVRGrabber hand, Collider grabPoint)
@@ -36,6 +45,7 @@ public class Grabbable : OVRGrabbable
 
         if (LockPosition)
         {
+            _oldRotation = hand.transform.localRotation;
             _oldGrabberParent = hand.transform.parent;
             hand.transform.SetParent(transform.parent);
         }
@@ -53,6 +63,8 @@ public class Grabbable : OVRGrabbable
         if (_oldGrabberParent)
         {
             m_grabbedBy.transform.SetParent(_oldGrabberParent);
+            m_grabbedBy.transform.localPosition = Vector3.zero;
+            m_grabbedBy.transform.localRotation = _oldRotation;
         }
 
         GrabStop.Invoke(m_grabbedBy);
