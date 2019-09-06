@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class MotorcycleController : MonoBehaviour
 {
+    [Header("Params")]
+    public float SpeedMulti = 10;
+    public float RotMulti = 5;
+
     [Header("Object Refs")]
     public Transform PlayerController;
     public Transform ThrottleLever;
@@ -29,9 +33,9 @@ public class MotorcycleController : MonoBehaviour
     {
         if (_isDriving && _initialThrottleDir.y < _grabber.forward.y)
         {
-            _trans.position += _trans.forward * (_grabber.forward.y - _initialThrottleDir.y) * Time.deltaTime;
+            _trans.position += _trans.forward * (_grabber.forward.y - _initialThrottleDir.y) * Time.deltaTime * SpeedMulti;
 
-            _trans.Rotate(Vector3.up, _headTransform.localPosition.x);
+            _trans.Rotate(Vector3.up, _headTransform.localPosition.x * RotMulti);
         }
     }
 

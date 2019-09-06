@@ -548,6 +548,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aec3121db95bcc54193ecd9cfe289a70, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  SpeedMulti: 10
+  RotMulti: 5
   PlayerController: {fileID: 0}
   ThrottleLever: {fileID: 478052895}
 --- !u!1 &567039888
